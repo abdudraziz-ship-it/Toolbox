@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0d12">
+<title>ToolBox — Utility gratuite</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg: #090b10;
+    --card: #11151d;
+    --card2: #171c25;
+    --text: #f3f5f7;
+    --muted: #8d96a5;
+    --accent: #6c7cff;
+    --accent2: #8b5cf6;
+    --border: #242b37;
+    --danger: #ff5c70;
+    --success: #35d07f;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+        radial-gradient(circle at top right, rgba(108,124,255,.14), transparent 35%),
+        var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+header {
+    padding: 28px 20px 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+
+.logo {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.logo span {
+    color: var(--accent);
+}
+
+.subtitle {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.container {
+    width: min(1100px, 94%);
+    margin: 0 auto;
+    padding: 25px 0 50px;
+}
+
+.search-box {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 16px 18px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-size: 16px;
+    outline: none;
+}
+
+.search-box input:focus {
+    border-color: var(--accent);
+}
+
+.category-title {
+    margin: 30px 0 14px;
+    font-size: 20px;
+}
+
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.tool-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 20px;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.tool-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+    background: var(--card2);
+}
+
+.icon {
+    font-size: 30px;
+    margin-bottom: 12px;
+}
+
+.tool-card h3 {
+    font-size: 17px;
+    margin-bottom: 7px;
+}
+
+.tool-card p {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.72);
+    z-index: 100;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-box {
+    width: min(600px, 100%);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    top: 15px;
+    right: 18px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.modal-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin: 13px 0 7px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 13px;
+    border-radius: 11px;
+    border: 1px solid var(--border);
+    background: var(--card2);
+    color: var(--text);
+    outline: none;
+    font-size: 15px;
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+button.action {
+    width: 100%;
+    margin-top: 16px;
+    padding: 14px;
+    border: none;
+    border-radius: 11px;
+    background: var(--accent);
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+button.action:hover {
+    filter: brightness(1.1);
+}
+
+.result {
+    margin-top: 18px;
+    padding: 15px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    line-height: 1.7;
+    word-break: break-word;
+}
+
+.result strong {
+    color: var(--accent);
+}
+
+.password-result {
+    font-family: monospace;
+    font-size: 18px;
+    text-align: center;
+    padding: 18px 8px;
+}
+
+footer {
+    text-align: center;
+    color: var(--muted);
+    padding: 30px 20px;
+    font-size: 13px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+@media (max-width: 600px) {
+    .logo {
+        font-size: 28px;
+    }
+
+    .tools-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .modal {
+        padding: 10px;
+    }
+
+    .modal-box {
+        padding: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">Tool<span>Box</span></div>
+    <div class="subtitle">
+        Utility semplici, veloci e gratuite.
+    </div>
+</header>
+
+<div class="container">
+
+    <div class="search-box">
+        <input
+            type="text"
+            id="search"
+            placeholder="🔎 Cerca uno strumento..."
+            oninput="searchTools()"
+        >
+    </div>
+
+    <h2 class="category-title">🧮 Matematica</h2>
+
+    <div class="tools-grid">
+
+        <div class="tool-card"
+             data-name="calcolatore calcolatrice matematica"
+             onclick="openTool('calculator')">
+            <div class="icon">🧮</div>
+            <h3>Calcolatore</h3>
+            <p>Operazioni matematiche rapide.</p>
+        </div>
+
+        <div class="tool-card"
+             data-name="percentuale percentuali"
+             onclick="openTool('percentage')">
+            <div class="icon">📊</div>
+            <h3>Percentuali</h3>
+            <p>Calcola percentuali e valori.</p>
+        </div>
+
+        <div class="tool-card"
+             data-name="sconto prezzo discount"
+             onclick="openTool('discount')">
+            <div class="icon">💰</div>
+            <h3>Calcolo sconto</h3>
+            <p>Scopri quanto paghi dopo uno sconto.</p>
+        </div>
+
+    </div>
+
+    <h2 class="category-title">🔄 Conversioni</h2>
+
+    <div class="tools-grid">
+
+        <div class="tool-card"
+             data-name="convertitore lunghezza peso temperatura"
+             onclick="openTool('converter')">
+            <div class="icon">🔄</div>
+            <h3>Convertitore unità</h3>
+            <p>Converti lunghezza, peso e temperatura.</p>
+        </div>
+
+        <div class="tool-card"
+             data-name="byte kb mb gb tb storage"
+             onclick="openTool('storage')">
+            <div class="icon">💾</div>
+            <h3>KB / MB / GB</h3>
+            <p>Converti dimensioni dei file.</p>
+        </div>
+
+        <div class="tool-card"
+             data-name="binario decimale esadecimale hexadecimal"
+             onclick="openTool('binary')">
+            <div class="icon">🔢</div>
+            <h3>Base converter</h3>
+            <p>Binario, decimale ed esadecimale.</p>
+        </div>
+
+    </div>
+
+    <h2 class="category-title">🌐 Informatica</h2>
+
+    <div class="tools-grid">
+
+        <div class="tool-card"
+             data-name="ipv4 ip subnet networking rete"
+             onclick="openTool('ipv4')">
+            <div class="icon">🌐</div>
+            <h3>IPv4 Calculator</h3>
+            <p>Calcola informazioni base di una rete IPv4.</p>
+        </div>
+
+        <div class="tool-card"
+             data-name="password sicurezza password generator"
+             onclick="openTool('password')">
+            <div class="icon">🔐</div>
+            <h3>Password Generator</h3>
+            <p>Genera password casuali.</p>
+        </div>
+
+    </div>
+
+    <h2 class="category-title">📅 Tempo</h2>
+
+    <div class="tools-grid">
+
+        <div class="tool-card"
+             data-name="date giorni calendario"
+             onclick="openTool('date')">
+            <div class="icon">📅</div>
+            <h3>Giorni tra date</h3>
+            <p>Calcola quanti giorni ci sono tra due date.</p>
+        </div>
+
+    </div>
+
+</div>
+
+<footer>
+    ToolBox v1.0 — progetto personale
+</footer>
+
+
+<!-- MODAL -->
+
+<div class="modal" id="modal">
+
+    <div class="modal-box">
+
+        <button class="close" onclick="closeTool()">×</button>
+
+        <div id="toolContent"></div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   GENERALE
+========================= */
+
+function openTool(tool) {
+
+    const modal = document.getElementById("modal");
+    const content = document.getElementById("toolContent");
+
+    modal.classList.add("active");
+
+    if (tool === "calculator") {
+        content.innerHTML = calculatorHTML();
+    }
+
+    if (tool === "percentage") {
+        content.innerHTML = percentageHTML();
+    }
+
+    if (tool === "discount") {
+        content.innerHTML = discountHTML();
+    }
+
+    if (tool === "converter") {
+        content.innerHTML = converterHTML();
+    }
+
+    if (tool === "storage") {
+        content.innerHTML = storageHTML();
+    }
+
+    if (tool === "binary") {
+        content.innerHTML = binaryHTML();
+    }
+
+    if (tool === "ipv4") {
+        content.innerHTML = ipv4HTML();
+    }
+
+    if (tool === "password") {
+        content.innerHTML = passwordHTML();
+    }
+
+    if (tool === "date") {
+        content.innerHTML = dateHTML();
+    }
+}
+
+
+function closeTool() {
+    document.getElementById("modal").classList.remove("active");
+}
+
+
+document.getElementById("modal").addEventListener("click", function(e) {
+    if (e.target === this) {
+        closeTool();
+    }
+});
+
+
+function searchTools() {
+
+    const query =
+        document.getElementById("search")
+        .value
+        .toLowerCase();
+
+    const cards =
+        document.querySelectorAll(".tool-card");
+
+    cards.forEach(card => {
+
+        const name =
+            card.dataset.name.toLowerCase();
+
+        if (name.includes(query)) {
+            card.classList.remove("hidden");
+        } else {
+            card.classList.add("hidden");
+        }
+
+    });
+}
+
+
+/* =========================
+   CALCOLATORE
+========================= */
+
+function calculatorHTML() {
+
+    return `
+        <div class="modal-title">🧮 Calcolatore</div>
+
+        <label>Primo numero</label>
+        <input id="calcA" type="number">
+
+        <label>Operazione</label>
+        <select id="calcOp">
+            <option value="+">+</option>
+            <option value="-">−</option>
+            <option value="*">×</option>
+            <option value="/">÷</option>
+            <option value="%">%</option>
+        </select>
+
+        <label>Secondo numero</label>
+        <input id="calcB" type="number">
+
+        <button class="action" onclick="calculate()">
+            Calcola
+        </button>
+
+        <div class="result" id="calcResult">
+            Risultato...
+        </div>
+    `;
+}
+
+
+function calculate() {
+
+    const a =
+        Number(document.getElementById("calcA").value);
+
+    const b =
+        Number(document.getElementById("calcB").value);
+
+    const op =
+        document.getElementById("calcOp").value;
+
+    let result;
+
+    if (op === "+") result = a + b;
+    if (op === "-") result = a - b;
+    if (op === "*") result = a * b;
+
+    if (op === "/") {
+
+        if (b === 0) {
+            result = "Errore: divisione per zero";
+        } else {
+            result = a / b;
+        }
+
+    }
+
+    if (op === "%") {
+        result = a % b;
+    }
+
+    document.getElementById("calcResult").innerHTML =
+        `<strong>Risultato:</strong> ${result}`;
+}
+
+
+/* =========================
+   PERCENTUALI
+========================= */
+
+function percentageHTML() {
+
+    return `
+        <div class="modal-title">📊 Percentuali</div>
+
+        <label>Percentuale (%)</label>
+        <input id="percentValue" type="number">
+
+        <label>Valore</label>
+        <input id="percentBase" type="number">
+
+        <button class="action" onclick="calculatePercentage()">
+            Calcola
+        </button>
+
+        <div class="result" id="percentResult">
+            Risultato...
+        </div>
+    `;
+}
+
+
+function calculatePercentage() {
+
+    const percent =
+        Number(document.getElementById("percentValue").value);
+
+    const base =
+        Number(document.getElementById("percentBase").value);
+
+    const result =
+        base * percent / 100;
+
+    document.getElementById("percentResult").innerHTML =
+        `<strong>${percent}% di ${base} = ${result}</strong>`;
+}
+
+
+/* =========================
+   SCONTO
+========================= */
+
+function discountHTML() {
+
+    return `
+        <div class="modal-title">💰 Calcolo sconto</div>
+
+        <label>Prezzo originale (€)</label>
+        <input id="price" type="number">
+
+        <label>Sconto (%)</label>
+        <input id="discount" type="number">
+
+        <button class="action" onclick="calculateDiscount()">
+            Calcola
+        </button>
+
+        <div class="result" id="discountResult">
+            Risultato...
+        </div>
+    `;
+}
+
+
+function calculateDiscount() {
+
+    const price =
+        Number(document.getElementById("price").value);
+
+    const discount =
+        Number(document.getElementById("discount").value);
+
+    const saved =
+        price * discount / 100;
+
+    const finalPrice =
+        price - saved;
+
+    document.getElementById("discountResult").innerHTML =
+        `
+        Prezzo originale: <strong>€${price.toFixed(2)}</strong><br>
+        Risparmio: <strong>€${saved.toFixed(2)}</strong><br>
+        Prezzo finale: <strong>€${finalPrice.toFixed(2)}</strong>
+        `;
+}
+
+
+/* =========================
+   CONVERTITORE
+========================= */
+
+function converterHTML() {
+
+    return `
+        <div class="modal-title">🔄 Convertitore</div>
+
+        <label>Valore</label>
+        <input id="convValue" type="number">
+
+        <label>Da</label>
+        <select id="convFrom">
+            <option value="m">Metri</option>
+            <option value="km">Chilometri</option>
+            <option value="cm">Centimetri</option>
+            <option value="kg">Chilogrammi</option>
+            <option value="g">Grammi</option>
+            <option value="c">Celsius</option>
+            <option value="f">Fahrenheit</option>
+        </select>
+
+        <label>A</label>
+        <select id="convTo">
+            <option value="m">Metri</option>
+            <option value="km">Chilometri</option>
+            <option value="cm">Centimetri</option>
+            <option value="kg">Chilogrammi</option>
+            <option value="g">Grammi</option>
+            <option value="c">Celsius</option>
+            <option value="f">Fahrenheit</option>
+        </select>
+
+        <button class="action" onclick="convert()">
+            Converti
+        </button>
+
+        <div class="result" id="convResult">
+            Risultato...
+        </div>
+    `;
+}
+
+
+function convert() {
+
+    const value =
+        Number(document.getElementById("convValue").value);
+
+    const from =
+        document.getElementById("convFrom").value;
+
+    const to =
+        document.getElementById("convTo").value;
+
+    let result;
+
+    const units = {
+        m: 1,
+        km: 1000,
+        cm: 0.01,
+        kg: 1,
+        g: 0.001
+    };
+
+    if (
+        ["m","km","cm"].includes(from) &&
+        ["m","km","cm"].includes(to)
+    ) {
+
+        result =
+            value * units[from] / units[to];
+
+    } else if (
+        ["kg","g"].includes(from) &&
+        ["kg","g"].includes(to)
+    ) {
+
+        result =
+            value * units[from] / units[to];
+
+    } else if (from === "c" && to === "f") {
+
+        result =
+            value * 9 / 5 + 32;
+
+    } else if (from === "f" && to === "c") {
+
+        result =
+            (value - 32) * 5 / 9;
+
+    } else if (from === to) {
+
+        result = value;
+
+    } else {
+
+        result =
+            "Conversione non disponibile";
+
+    }
+
+    document.getElementById("convResult").innerHTML =
+        `<strong>Risultato:</strong> ${result}`;
+}
+
+
+/* =========================
+   STORAGE
+========================= */
+
+function storageHTML() {
+
+    return `
+        <div class="modal-title">💾 Storage Converter</div>
+
+        <label>Valore</label>
+        <input id="storageValue" type="number">
+
+        <label>Da</label>
+        <select id="storageFrom">
+            <option value="B">Byte</option>
+            <option value="KB">KB</option>
+            <option value="MB">MB</option>
+            <option value="GB">GB</option>
+            <option value="TB">TB</option>
+        </select>
+
+        <label>A</label>
+        <select id="storageTo">
+            <option value="B">Byte</option>
+            <option value="KB">KB</option>
+            <option value="MB">MB</option>
+            <option value="GB">GB</option>
+            <option value="TB">TB</option>
+        </select>
+
+        <button class="action" onclick="convertStorage()">
+            Converti
+        </button>
+
+        <div class="result" id="storageResult">
+            Risultato...
+        </div>
+    `;
+}
+
+
+function convertStorage() {
+
+    const value =
+        Number(document.getElementById("storageValue").value);
+
+    const from =
+        document.getElementById("storageFrom").value;
+
+    const to =
+        document.getElementById("storageTo").value;
+
+    const multipliers = {
+        B: 1,
+        KB: 1024,
+        MB: 1024 ** 2,
+        GB: 1024 ** 3,
+        TB: 1024 ** 4
+    };
+
+    const bytes =
+        value * multipliers[from];
+
+    const result =
+        bytes / multipliers[to];
+
+    document.getElementById("storageResult").innerHTML =
+        `<strong>${result}</strong> ${to}`;
+}
+
+
+/* =========================
+   BINARY
+========================= */
+
+function binaryHTML() {
+
+    return `
+        <div class="modal-title">🔢 Base Converter</div>
+
+        <label>Numero</label>
+        <input id="binaryValue" type="text">
+
+        <label>Base di partenza</label>
+        <select id="binaryFrom">
+            <option value="2">Binario</option>
+            <option value="10">Decimale</option>
+            <option value="16">Esadecimale</option>
+        </select>
+
+        <button class="action" onclick="convertBinary()">
+            Converti
+        </button>
+
+        <div class="result" id="binaryResult">
+            Risultato...
+        </div>
+    `;
+}
+
+
+function convertBinary() {
+
+    const value =
+        document.getElementById("binaryValue").value.trim();
+
+    const base =
+        Number(document.getElementById("binaryFrom").value);
+
+    const decimal =
+        parseInt(value, base);
+
+    if (Number.isNaN(decimal)) {
+
+        document.getElementById("binaryResult").innerHTML =
+            "Numero non valido.";
+
+        return;
+    }
+
+    document.getElementById("binaryResult").innerHTML =
+        `
+        <strong>Binario:</strong>
+        ${decimal.toString(2)}<br>
+
+        <strong>Decimale:</strong>
+        ${decimal}<br>
+
+        <strong>Esadecimale:</strong>
+        ${decimal.toString(16).toUpperCase()}
+        `;
+}
+
+
+/* =========================
+   IPV4
+========================= */
+
+function ipv4HTML() {
+
+    return `
+        <div class="modal-title">🌐 IPv4 Calculator</div>
+
+        <label>Indirizzo IPv4</label>
+        <input
+            id="ip"
+            type="text"
+            placeholder="192.168.1.10"
+        >
+
+        <label>Prefix</label>
+        <select id="prefix">
+
+            <option value="8">/8</option>
+            <option value="16">/16</option>
+            <option value="24" selected>/24</option>
+            <option value="25">/25</option>
+            <option value="26">/26</option>
+            <option value="27">/27</option>
+            <option value="28">/28</option>
+            <option value="29">/29</option>
+            <option value="30">/30</option>
+
+        </select>
+
+        <button class="action" onclick="calculateIPv4()">
+            Calcola rete
+        </button>
+
+        <div class="result" id="ipResult">
+            Risultato...
+        </div>
+    `;
+}
+
+
+function ipToNumber(ip) {
+
+    const parts = ip.split(".").map(Number);
+
+    return (
+        parts[0] * 256 ** 3 +
+        parts[1] * 256 ** 2 +
+        parts[2] * 256 +
+        parts[3]
+    );
+}
+
+
+function numberToIP(num) {
+
+    return [
+        Math.floor(num / 256 ** 3) % 256,
+        Math.floor(num / 256 ** 2) % 256,
+        Math.floor(num / 256) % 256,
+        num % 256
+    ].join(".");
+}
+
+
+function calculateIPv4() {
+
+    const ip =
+        document.getElementById("ip").value.trim();
+
+    const prefix =
+        Number(document.getElementById("prefix").value);
+
+    const parts =
+        ip.split(".").map(Number);
+
+    if (
+        parts.length !== 4 ||
+        parts.some(x => Number.isNaN(x) || x < 0 || x > 255)
+    ) {
+
+        document.getElementById("ipResult").innerHTML =
+            "❌ Indirizzo IPv4 non valido.";
+
+        return;
+    }
+
+    const ipNumber =
+        ipToNumber(ip);
+
+    const mask =
+        prefix === 0
+        ? 0
+        : (0xFFFFFFFF << (32 - prefix)) >>> 0;
+
+    const network =
+        (ipNumber & mask) >>> 0;
+
+    const broadcast =
+        (network | (~mask >>> 0)) >>> 0;
+
+    const hosts =
+        prefix >= 31
+        ? 0
+        : 2 ** (32 - prefix) - 2;
+
+    document.getElementById("ipResult").innerHTML =
+        `
+        <strong>Network:</strong>
+        ${numberToIP(network)}<br>
+
+        <strong>Broadcast:</strong>
+        ${numberToIP(broadcast)}<br>
+
+        <strong>Subnet Mask:</strong>
+        ${numberToIP(mask)}<br>
+
+        <strong>Host utilizzabili:</strong>
+        ${hosts}
+        `;
+}
+
+
+/* =========================
+   PASSWORD
+========================= */
+
+function passwordHTML() {
+
+    return `
+        <div class="modal-title">🔐 Password Generator</div>
+
+        <label>Lunghezza</label>
+        <input
+            id="passwordLength"
+            type="number"
+            value="16"
+            min="4"
+            max="100"
+        >
+
+        <label>
+            <input
+                id="includeNumbers"
+                type="checkbox"
+                checked
+            >
+            Numeri
+        </label>
+
+        <label>
+            <input
+                id="includeSymbols"
+                type="checkbox"
+                checked
+            >
+            Simboli
+        </label>
+
+        <button class="action" onclick="generatePassword()">
+            Genera password
+        </button>
+
+        <div class="result password-result"
+             id="passwordResult">
+            Clicca genera.
+        </div>
+    `;
+}
+
+
+function generatePassword() {
+
+    const length =
+        Number(document.getElementById("passwordLength").value);
+
+    let chars =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+    if (
+        document.getElementById("includeNumbers").checked
+    ) {
+
+        chars += "0123456789";
+
+    }
+
+    if (
+        document.getElementById("includeSymbols").checked
+    ) {
+
+        chars += "!@#$%^&*()-_=+[]{}";
+
+    }
+
+    let password = "";
+
+    for (let i = 0; i < length; i++) {
+
+        const index =
+            Math.floor(Math.random() * chars.length);
+
+        password += chars[index];
+
+    }
+
+    document.getElementById("passwordResult").textContent =
+        password;
+}
+
+
+/* =========================
+   DATE
+========================= */
+
+function dateHTML() {
+
+    return `
+        <div class="modal-title">📅 Giorni tra date</div>
+
+        <label>Prima data</label>
+        <input id="date1" type="date">
+
+        <label>Seconda data</label>
+        <input id="date2" type="date">
+
+        <button class="action" onclick="calculateDates()">
+            Calcola
+        </button>
+
+        <div class="result" id="dateResult">
+            Risultato...
+        </div>
+    `;
+}
+
+
+function calculateDates() {
+
+    const first =
+        new Date(document.getElementById("date1").value);
+
+    const second =
+        new Date(document.getElementById("date2").value);
+
+    if (
+        isNaN(first.getTime()) ||
+        isNaN(second.getTime())
+    ) {
+
+        document.getElementById("dateResult").innerHTML =
+            "Seleziona entrambe le date.";
+
+        return;
+    }
+
+    const difference =
+        Math.abs(second - first);
+
+    const days =
+        Math.floor(
+            difference / (1000 * 60 * 60 * 24)
+        );
+
+    document.getElementById("dateResult").innerHTML =
+        `
+        Tra le due date ci sono
+        <strong>${days}</strong>
+        giorni.
+        `;
+}
+
+</script>
+
+</body>
+</html>
